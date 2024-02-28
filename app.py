@@ -1,9 +1,10 @@
-import pygame 
+import pygame, sys, random
 from Player import *
 from Ball import *
-import random
 
 #Constantes
+opponent_speed = 5
+
 
 pygame.init()
 screen_width, screen_height = 800, 700
@@ -13,52 +14,62 @@ pygame.display.set_caption('re-pong')
 color_player = (255, 255, 255)
 light_grey = (180, 180, 180)
 
-player1 =  Player(screen_width/2 - 70, 20, color=color_player, speed=7)
-player2 =  Player(screen_width/2 - 70, screen_height-30, color=color_player, speed=7)
+opponent = Player(screen_width/2 - 70, 20, color=color_player, speed=7)
+player = Player(screen_width/2 - 70, screen_height-30, color=color_player, speed=7)
 ball = Ball(screen_width/2 - 7, screen_height/2 - 7, 15, 15)
 
-ball_speed_x = 7
-ball_speed_y = 7
 
-running = True
 clock = pygame.time.Clock()
-while running:
+
+
+game_font = pygame.font.Font('freesansbold.ttf', 23)
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            sys.exit()
 
-    ball.x += ball_speed_x
-    ball.y += ball_speed_y
-    
+    ball.move()
+
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        player1.left()
+        player.move_left()
     if keys[pygame.K_RIGHT]:
-        player1.right()
-    if keys[pygame.K_a]:
-        player2.left()
-    if keys[pygame.K_d]:
-        player2.right()
+        player.move_right()
 
-    if ball.top <= 0 or ball.bottom >= screen_height:
-        ball_speed_y *= -1
+    if keys[pygame.K_a]:
+        opponent.move_left()
+    if keys[pygame.K_d]:
+        opponent.move_right()
+    
+    if ball.bottom >= screen_height:
+        opponent.score += 1
+        ball.restart(screen_width, screen_height)
+
+    if ball.top <= 0 :
+        player.score += 1
+        ball.restart(screen_width, screen_height)
+
     if ball.left <= 0 or ball.right >= screen_width:
-        ball_speed_x *= -1 
+        ball.speed_x *= -1 
 
     # La balle doit rebondir en contact n'importe quel joueur
-    if ball.colliderect(player1) or ball.colliderect(player2):
-        ball_speed_y *= -1 
+    if ball.colliderect(opponent) or ball.colliderect(player):
+        ball.speed_y *= -1
 
 
     screen.fill('black')
 
-    player1.render(screen)
-    player2.render(screen)
+    opponent.render(screen)
+    player.render(screen)
     ball.render(screen)
-    
     pygame.draw.aaline(screen, light_grey, (0, screen_height/2), (screen_width, screen_height/2))
     
+    player_text = game_font.render(f'{player.score}', True, light_grey)
+    opponent_text = game_font.render(f'{opponent.score}', True, light_grey)
+    screen.blit(player_text, (screen_width / 2, screen_height/2 + 20))
+    screen.blit(opponent_text, (screen_width / 2, screen_height/2 - 40))
+
     pygame.display.flip()
     clock.tick(60)
 
-pygame.quit()

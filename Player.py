@@ -5,14 +5,15 @@ class Player(pygame.Rect):
         super().__init__(x, y, 140, 10)
         self.speed = speed
         self.color = color
+        self.score = 0
 
     def render(self, screen):
         pygame.draw.rect(screen, self.color, self)
 
-    def right(self):
+    def move_right(self):
         if self.x < 660:
             self.x += self.speed 
 
-    def left(self):
+    def move_left(self):
         if self.x > 0: 
             self.x -= self.speed 
