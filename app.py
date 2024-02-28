@@ -21,7 +21,7 @@ ball = Ball(screen_width/2 - 7, screen_height/2 - 7, 15, 15)
 
 clock = pygame.time.Clock()
 
-
+score_time = True
 game_font = pygame.font.Font('freesansbold.ttf', 23)
 while True:
     for event in pygame.event.get():
@@ -41,13 +41,18 @@ while True:
         opponent.move_left()
     if keys[pygame.K_d]:
         opponent.move_right()
+
+    if ball.score_time:
+        ball.restart(screen_width, screen_height)
     
     if ball.bottom >= screen_height:
         opponent.score += 1
+        ball.score_time = pygame.time.get_ticks()
         ball.restart(screen_width, screen_height)
 
     if ball.top <= 0 :
         player.score += 1
+        ball.score_time = pygame.time.get_ticks()
         ball.restart(screen_width, screen_height)
 
     if ball.left <= 0 or ball.right >= screen_width:
